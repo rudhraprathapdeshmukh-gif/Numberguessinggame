@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef2ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .game {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            width: 320px;
+            box-shadow: 0 8px 25px #0002;
+        }
+
+        h1 { color: #2563eb; }
+
+        input, select, button {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        input, select { border: 1px solid #ccc; }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #message { min-height: 24px; }
+    </style>
+</head>
+<body>
+    <div class="game">
+        <h1>Guess the Number</h1>
+        <p>Guess a number within the selected range.</p>
+
+        <select id="difficulty" onchange="restart()">
+            <option value="50">Easy (1–50)</option>
+            <option value="100" selected>Medium (1–100)</option>
+            <option value="500">Hard (1–500)</option>
+        </select>
+
+        <input id="guess" type="number" min="1"
+               placeholder="Enter your guess">
+
+        <button onclick="checkGuess()">Guess</button>
+        <button onclick="restart()">Restart Game</button>
+
+        <p id="message">Start guessing!</p>
+        <p id="attempts">Attempts: 0</p>
+        <p id="score">Score: 0</p>
+    </div>
+
+    <script>
+        let maxNumber;
+        let number;
+        let attempts = 0;
+        let score = 0;
+        let finished = false;
+
+        function restart() {
+            maxNumber = Number(
+                document.getElementById("difficulty").value
+            );
+            number = Math.floor(Math.random() * maxNumber) + 1;
+            attempts = 0;
+            finished = false;
+
+            document.getElementById("guess").value = "";
+            document.getElementById("guess").max = maxNumber;
+            document.getElementById("message").textContent =
+                `Guess a number from 1 to ${maxNumber}`;
+            document.getElementById("attempts").textContent =
+                "Attempts: 0";
+        }
+
+        function checkGuess() {
+            if (finished) return;
+
+            const input = document.getElementById("guess");
+            const guess = Number(input.value);
+
+            if (input.value.trim() === "" ||
+                !Number.isInteger(guess) ||
+                guess < 1 || guess > maxNumber) {
+                document.getElementById("message").textContent =
+                    `Enter a whole number from 1 to ${maxNumber}.`;
+                return;
+            }
+
+            attempts++;
+            document.getElementById("attempts").textContent =
+                `Attempts: ${attempts}`;
+
+            if (guess < number) {
+                document.getElementById("message").textContent =
+                    "Too low! Try a bigger number.";
+            } else if (guess > number) {
+                document.getElementById("message").textContent =
+                    "Too high! Try a smaller number.";
+            } else {
+                const points = Math.max(10, 100 - (attempts - 1) * 10);
+                score += points;
+                finished = true;
+
+                document.getElementById("message").textContent =
+                    `Correct! You won in ${attempts} attempts!`;
+                document.getElementById("score").textContent =
+                    `Score: ${score}`;
+            }
+
+            input.value = "";
+            input.focus();
+        }
+
+        document.getElementById("guess").addEventListener(
+            "keydown", function(event) {
+                if (event.key === "Enter") checkGuess();
+            }
+        );
+
+        restart();
+    </script>
+</body>
+</html>
